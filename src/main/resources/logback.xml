@@ -3,13 +3,19 @@
 
 <configuration scan="true" scanPeriod="30 seconds">
 
+    <!--
+      Allow logger configuration from the environment by setting CONSOLE_LOG_PATTERN.
+      See: https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-docs/src/docs/asciidoc/howto/logging.adoc#configure-logback-for-logging
+    -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
     </contextListener>
     
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-5level %logger{0} - %msg%n</pattern>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
