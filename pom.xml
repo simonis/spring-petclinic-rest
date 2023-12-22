@@ -163,6 +163,43 @@
     <build>
         <plugins>
             <plugin>
+                <!-- Also create a shaded (i.e. "exploded") version of the project such that we can
+                     put the resulting jar file on the classpatch and run the main application class
+                     (i.e. org.springframework.samples.petclinic.PetClinicApplication) from it.
+                     This is e.g. useful if we want to put the Spring classes and all their dependencies
+                     into a CDS archive. This doesn't work with nested jars and Spring Boot's JarLauncher.
+                     Notice that the maven-shade-plugin must come *before* the spring-boot-maven-plugin!
+                -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- The following element is required because Spring Boot has its own
+                             maven-shade-plugin config. See the following SO question for more details:
+                             https://stackoverflow.com/questions/49215416/maven-shade-plugin-cannot-find-resource-in-class-org-apache-maven-plugins-sh
+                        -->
+                        <id>shade-jar-with-main-class</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.springframework.samples.petclinic.PetClinicApplication</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
