@@ -192,6 +192,14 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.springframework.samples.petclinic.PetClinicApplication</mainClass>
+                                    <!-- We need to set 'Multi-Release' to true because some dependencies are
+                                         multi-release jar files. Particularly, support for virtual threads in Spring
+                                         itself (i.e. '-Dspring.threads.virtual.enabled=true') is implemented only for
+                                         JDK 21 with the help of the multi-release feature.
+                                    -->
+                                    <manifestEntries>
+                                        <Multi-Release>true</Multi-Release>
+                                    </manifestEntries>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -215,6 +223,36 @@
                                 <encoding.reporting>${project.reporting.outputEncoding}</encoding.reporting>
                                 <java.release>${maven.compiler.release}</java.release>
                             </additionalProperties>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>repackage</id>
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <!-- Use the maven-dependency-plugin to copy all the dependencies to ./target/dependency/
+                     This allows us to run the "thin" jar file by putting ./target/dependency/* on the class path.
+                     E.g.: java -cp ./target/dependency/*:./target/spring-petclinic-rest-3.2.1.jar org.springframework.samples.petclinic.PetClinicApplication
+                -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
                     </execution>
                 </executions>
