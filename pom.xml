@@ -201,6 +201,14 @@
                                         <Multi-Release>true</Multi-Release>
                                     </manifestEntries>
                                 </transformer>
+                                <!-- We need this otherwise our own './src/main/resources/META-INF/spring.factories' will
+                                     overwrite other 'spring.factories' in the resulting shaded jar. For more details see:
+                                     https://github.com/spring-projects/spring-boot/issues/384
+                                -->
+                                <transformer
+                                    implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+                                    <resource>META-INF/spring.factories</resource>
+                                </transformer>
                             </transformers>
                         </configuration>
                     </execution>
