@@ -16,6 +16,12 @@ The [spring-petclinic-angular project](https://github.com/spring-petclinic/sprin
 
 ## Running petclinic locally
 
+In contrast to the upstream project, this clone builds three artifacts:
+
+- `./target/spring-petclinic-rest-3.2.1-exec.jar`: the original, *fat* jar file which can be run with `java -jar ./target/spring-petclinic-rest-3.2.1-exec.jar` (using the internal `org.springframework.boot.loader.launch.JarLauncher` which can load classes from the embedded jar files under `spring-petclinic-rest-3.2.1-exec.jar:BOOT-INF/lib/*.jar`).
+- `./target/spring-petclinic-rest-3.2.1-shaded.jar`: a *shaded* version of the above which extracts all the embedded jar files such that the the application can be run by directly executing the main application class with `java -cp ./target/spring-petclinic-rest-3.2.1-shaded.jar org.springframework.samples.petclinic.PetClinicApplication` (this is more AppCDS friendly because it doesn't use a custom class loader for loading nested jar files).
+- `./target/spring-petclinic-rest-3.2.1.jar`: a *thin* jar file which only contains the application classes with all the dependencies under `.target/dependency` such that the application can be run with `java -cp ./target/dependency/*:./target/spring-petclinic-rest-3.2.1.jar org.springframework.samples.petclinic.PetClinicApplication` (again, AppCDS friendly). This is basically what is executed by `./mvnw spring-boot:run` (see below) with the only difference that the latter takes the dependencies right from the Maven repository `~/.m2/repository`. 
+
 ### With maven command line
 ```
 git clone https://github.com/spring-petclinic/spring-petclinic-rest.git
