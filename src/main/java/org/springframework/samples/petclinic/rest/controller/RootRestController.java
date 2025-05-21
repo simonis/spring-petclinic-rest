@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 public class RootRestController {
 
-    @Value("#{servletContext.contextPath}")
+    @Value("${server.servlet.context-path}")
     private String servletContextPath;
 
 	@RequestMapping(value = "/")
